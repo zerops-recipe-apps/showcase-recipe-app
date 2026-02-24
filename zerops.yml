@@ -1,0 +1,92 @@
+zerops:
+  # Production setup — build frontend + bundle backend
+  - setup: prod
+    build:
+      base: bun@1.2
+
+      envVariables:
+        BUN_INSTALL: ./.bun
+
+      buildCommands:
+        - bun install --frozen-lockfile
+        # Build frontend
+        - cd frontend && bun install --frozen-lockfile && bun run build && cd ..
+        # Bundle backend (includes all deps)
+        - bun build src/index.ts --outfile dist/index.js --target bun
+
+      deployFiles:
+        - ./dist
+        - ./frontend/dist
+        - ./src/db/schema.sql
+        - ./seed
+
+      cache:
+        - node_modules
+        - frontend/node_modules
+        - .bun/install/cache
+
+    deploy:
+      readinessCheck:
+        httpGet:
+          port: 3000
+          path: /api/health
+
+    run:
+      base: bun@1.2
+
+      ports:
+        - port: 3000
+          httpSupport: true
+
+      envVariables:
+        NODE_ENV: production
+        DB_HOST: ${db_hostname}
+        DB_PORT: ${db_port}
+        DB_USER: ${db_user}
+        DB_PASS: ${db_password}
+        DB_NAME: ${db_dbName}
+        REDIS_HOST: ${redis_hostname}
+        REDIS_PORT: ${redis_port}
+        NATS_HOST: ${queue_hostname}
+        NATS_PORT: ${queue_port}
+        NATS_USER: ${queue_user}
+        NATS_PASS: ${queue_password}
+        S3_ENDPOINT: ${storage_apiUrl}
+        S3_ACCESS_KEY: ${storage_accessKeyId}
+        S3_SECRET_KEY: ${storage_secretAccessKey}
+        S3_BUCKET: ${storage_bucketName}
+
+      start: bun run dist/index.js
+
+  # Development setup — deploy full source for live editing via SSH
+  - setup: dev
+    build:
+      base: bun@1.2
+
+      envVariables:
+        BUN_INSTALL: ./.bun
+
+      buildCommands:
+        - bun install
+        - cd frontend && bun install && cd ..
+
+      deployFiles:
+        - ./
+
+      cache:
+        - node_modules
+        - frontend/node_modules
+        - .bun/install/cache
+
+    run:
+      base: bun@1.2
+
+      ports:
+        - port: 3000
+          httpSupport: true
+
+      envVariables:
+        NODE_ENV: development
+
+      # Container stays idle — developer starts server manually via SSH
+      start: zsc noop --silent

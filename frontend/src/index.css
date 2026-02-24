@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+.animate-dash {
+  animation: dash 0.6s linear infinite;
+}
+
+:root {
+  --edge-idle: #d4d4d8;
+  --edge-active: #22c55e;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}

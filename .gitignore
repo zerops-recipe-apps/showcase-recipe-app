@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Bun's global package cache (redirected into project tree via BUN_INSTALL)
+.bun/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Logs
+*.log
