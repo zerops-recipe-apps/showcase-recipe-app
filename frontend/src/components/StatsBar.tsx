@@ -27,6 +27,11 @@ export function StatsBar() {
             <span className="text-sm font-semibold text-zinc-700 font-mono">{item.value}</span>
           </div>
         ))}
+        <div className="ml-auto flex-shrink-0">
+          <span className="text-[10px] text-zinc-400 italic">
+            Processing is throttled so you can follow each step in real time
+          </span>
+        </div>
       </div>
     </div>
   );
