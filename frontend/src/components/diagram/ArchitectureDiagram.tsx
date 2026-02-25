@@ -3,8 +3,6 @@ import {
   ReactFlow,
   Background,
   BackgroundVariant,
-  useNodesState,
-  useEdgesState,
   type NodeTypes,
   type EdgeTypes,
 } from "@xyflow/react";
@@ -28,11 +26,8 @@ const edgeTypes: EdgeTypes = {
 export function ArchitectureDiagram() {
   const coreMode = usePipelineStore((s) => s.coreMode);
 
-  const initialNodes = useMemo(() => buildNodes(coreMode), [coreMode]);
-  const initialEdges = useMemo(() => buildEdges(coreMode), [coreMode]);
-
-  const [nodes] = useNodesState(initialNodes);
-  const [edges] = useEdgesState(initialEdges);
+  const nodes = useMemo(() => buildNodes(coreMode), [coreMode]);
+  const edges = useMemo(() => buildEdges(coreMode), [coreMode]);
 
   return (
     <div className="w-full h-full rounded-xl border border-zinc-200 bg-zinc-50/50 overflow-hidden">
