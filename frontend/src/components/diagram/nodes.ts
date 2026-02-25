@@ -4,8 +4,10 @@ import type { ServiceNodeData } from "./types";
 type CoreMode = "lightweight" | "serious";
 
 // --- Layout constants ---
-const CENTER = 270;
-const RIGHT = 500;
+const LEFT = 30;
+const CENTER_LEFT = 200;
+const CENTER_RIGHT = 380;
+const RIGHT = 550;
 
 // --- Lightweight core ---
 function lightweightInfraNodes(): Node[] {
@@ -13,7 +15,7 @@ function lightweightInfraNodes(): Node[] {
     {
       id: "core",
       type: "infra",
-      position: { x: CENTER, y: 30 },
+      position: { x: CENTER_LEFT, y: 30 },
       data: {
         label: "Zerops Core",
         sublabel: "L3 + L7 balancer, firewall, stats, logger",
@@ -36,7 +38,7 @@ function seriousInfraNodes(): Node[] {
     {
       id: "core",
       type: "infra",
-      position: { x: CENTER - 60, y: 10 },
+      position: { x: CENTER_LEFT - 10, y: 10 },
       data: {
         label: "Project Core",
         sublabel: "Dedicated infrastructure service",
@@ -48,7 +50,7 @@ function seriousInfraNodes(): Node[] {
     {
       id: "l7",
       type: "infra",
-      position: { x: CENTER, y: 100 },
+      position: { x: CENTER_LEFT, y: 100 },
       data: {
         label: "L7 HTTP Balancer",
         sublabel: "Dedicated routing service",
@@ -69,8 +71,7 @@ function seriousInfraEdges(): Edge[] {
 // --- Build nodes/edges for a given mode ---
 export function buildNodes(mode: CoreMode): Node[] {
   const appY = mode === "serious" ? 210 : 160;
-  const managedY = appY + 130;
-  const storageY = managedY + 110;
+  const dataY = appY + 130;
 
   const infraNodes = mode === "serious" ? seriousInfraNodes() : lightweightInfraNodes();
 
@@ -78,7 +79,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "app",
       type: "service",
-      position: { x: CENTER, y: appY },
+      position: { x: CENTER_LEFT, y: appY },
       data: {
         label: "Frontend + API",
         sublabel: "Bun + Hono + React",
@@ -91,7 +92,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "nats",
       type: "service",
-      position: { x: RIGHT, y: appY },
+      position: { x: CENTER_RIGHT, y: appY },
       data: {
         label: "NATS",
         sublabel: "Message Broker",
@@ -104,7 +105,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "db",
       type: "service",
-      position: { x: 50, y: managedY },
+      position: { x: LEFT, y: dataY },
       data: {
         label: "PostgreSQL",
         sublabel: "Database",
@@ -117,7 +118,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "valkey",
       type: "service",
-      position: { x: CENTER, y: managedY },
+      position: { x: CENTER_LEFT, y: dataY },
       data: {
         label: "Valkey",
         sublabel: "Cache",
@@ -130,7 +131,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "worker",
       type: "service",
-      position: { x: RIGHT, y: managedY },
+      position: { x: CENTER_RIGHT, y: dataY },
       data: {
         label: "Worker",
         sublabel: "Python + Pillow",
@@ -143,7 +144,7 @@ export function buildNodes(mode: CoreMode): Node[] {
     {
       id: "storage",
       type: "service",
-      position: { x: CENTER + 30, y: storageY },
+      position: { x: RIGHT, y: dataY },
       data: {
         label: "Object Storage",
         sublabel: "S3-compatible",
