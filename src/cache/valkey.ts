@@ -1,6 +1,15 @@
 import Redis from "ioredis";
 import { config } from "../config";
 
+export interface PipelineEvent {
+  id: string;
+  type: "upload" | "step" | "processed" | "error";
+  timestamp: number;
+  description: string;
+  detail?: string;
+  durationMs?: number;
+}
+
 export const valkey = new Redis({
   host: config.valkey.host,
   port: config.valkey.port,
@@ -31,4 +40,17 @@ export async function decrementActiveJobs() {
 export async function getActiveJobs(): Promise<number> {
   const count = await valkey.get("stats:active_jobs");
   return parseInt(count || "0");
+}
+
+const EVENTS_KEY = "pipeline:events";
+const MAX_EVENTS = 100;
+
+export async function pushEvent(event: PipelineEvent) {
+  await valkey.lpush(EVENTS_KEY, JSON.stringify(event));
+  await valkey.ltrim(EVENTS_KEY, 0, MAX_EVENTS - 1);
+}
+
+export async function getRecentEvents(limit = 50): Promise<PipelineEvent[]> {
+  const items = await valkey.lrange(EVENTS_KEY, 0, limit - 1);
+  return items.map((item) => JSON.parse(item) as PipelineEvent);
 }

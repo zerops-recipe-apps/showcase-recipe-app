@@ -3,7 +3,7 @@ import { config } from "../config";
 import { createUpload } from "../db/queries";
 import { uploadToS3 } from "../storage/s3";
 import { publishUploaded } from "../nats/publisher";
-import { incrementActiveJobs } from "../cache/valkey";
+import { incrementActiveJobs, pushEvent } from "../cache/valkey";
 import { wsManager } from "../ws/manager";
 import type { WSMessage } from "../ws/protocol";
 
@@ -53,17 +53,26 @@ uploadRoute.post("/upload", async (c) => {
       filename: file.name,
       sizeBytes: file.size,
       timestamp: Date.now(),
-      activeNodes: ["app", "api", "storage", "db", "nats"],
-      activeEdges: ["app-api", "api-storage", "api-db", "api-nats"],
+      activeNodes: ["core", "l7", "app", "storage", "db", "nats"],
+      activeEdges: ["core-app", "core-l7", "l7-app", "app-storage", "app-db", "app-nats"],
       edgeLabels: {
-        "app-api": `POST ${file.name} (${sizeDisplay})`,
-        "api-storage": `PUT original (${sizeDisplay})`,
-        "api-db": "INSERT upload record",
-        "api-nats": "PUBLISH pipeline.uploaded",
+        "core-app": `POST /api/upload (${sizeDisplay})`,
+        "core-l7": "HTTPS request",
+        "l7-app": `POST /api/upload`,
+        "app-storage": `PUT original`,
+        "app-db": "INSERT upload record",
+        "app-nats": "PUBLISH pipeline.uploaded",
       },
     },
   };
   wsManager.broadcast(wsMsg);
+  await pushEvent({
+    id: upload.id,
+    type: "upload",
+    timestamp: Date.now(),
+    description: `Uploaded ${file.name}`,
+    detail: sizeDisplay,
+  });
 
   publishUploaded({
     id: upload.id,

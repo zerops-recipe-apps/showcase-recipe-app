@@ -11,10 +11,12 @@ import "@xyflow/react/dist/style.css";
 
 import { serviceNodes, serviceEdges } from "./nodes";
 import { ServiceNode } from "./ServiceNode";
+import { InfraNode } from "./InfraNode";
 import { AnimatedEdge } from "./AnimatedEdge";
 
 const nodeTypes: NodeTypes = {
   service: ServiceNode,
+  infra: InfraNode,
 };
 
 const edgeTypes: EdgeTypes = {
@@ -32,7 +34,7 @@ export function ArchitectureDiagram() {
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs font-medium text-zinc-600">Live Architecture</span>
         </div>
-        <span className="text-[10px] text-zinc-400 font-mono">Zerops Private Network</span>
+        <span className="text-[10px] text-zinc-400 font-mono">Zerops Project Infrastructure</span>
       </div>
 
       <ReactFlow

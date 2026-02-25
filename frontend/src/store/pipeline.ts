@@ -51,6 +51,7 @@ interface PipelineStore {
 
   events: PipelineEvent[];
   addEvent: (event: PipelineEvent) => void;
+  loadEvents: () => Promise<void>;
 
   gallery: GalleryItem[];
   setGallery: (items: GalleryItem[]) => void;
@@ -106,6 +107,26 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
     set((state) => ({
       events: [event, ...state.events].slice(0, 100),
     })),
+  loadEvents: async () => {
+    try {
+      const res = await fetch("/api/events?limit=50");
+      if (res.ok) {
+        const data = await res.json();
+        set((state) => {
+          // Merge: keep any events already in state (from live WS) that aren't in the fetched list
+          const fetchedIds = new Set(
+            data.events.map((e: PipelineEvent) => `${e.id}-${e.type}-${e.timestamp}`)
+          );
+          const uniqueExisting = state.events.filter(
+            (e) => !fetchedIds.has(`${e.id}-${e.type}-${e.timestamp}`)
+          );
+          return { events: [...uniqueExisting, ...data.events].slice(0, 100) };
+        });
+      }
+    } catch (err) {
+      console.warn("[store] Failed to load events:", err);
+    }
+  },
 
   gallery: [],
   setGallery: (items) => set({ gallery: items }),

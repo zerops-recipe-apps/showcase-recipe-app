@@ -10,6 +10,7 @@ import { uploadRoute } from "./routes/upload";
 import { galleryRoute } from "./routes/gallery";
 import { statsRoute } from "./routes/stats";
 import { demoRoute } from "./routes/demo";
+import { eventsRoute } from "./routes/events";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
@@ -23,6 +24,7 @@ app.route("/api", uploadRoute);
 app.route("/api", galleryRoute);
 app.route("/api", statsRoute);
 app.route("/api", demoRoute);
+app.route("/api", eventsRoute);
 
 // Health check
 app.get("/api/health", async (c) => {
