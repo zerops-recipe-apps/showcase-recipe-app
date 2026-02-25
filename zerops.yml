@@ -18,7 +18,6 @@ zerops:
         - ./dist
         - ./frontend/dist
         - ./src/db/schema.sql
-        - ./seed
 
       cache:
         - node_modules
