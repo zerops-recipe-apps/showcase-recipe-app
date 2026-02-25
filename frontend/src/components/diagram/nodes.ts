@@ -1,17 +1,14 @@
 import type { Node, Edge } from "@xyflow/react";
 import type { ServiceNodeData } from "./types";
 
-// Read core mode from env at build time
-// "serious" = dedicated infrastructure (separate L3, L7, stats, logger nodes)
-// "lightweight" = single core container with all processes
-const CORE_MODE = (import.meta as any).env?.VITE_CORE_MODE || "lightweight";
+type CoreMode = "lightweight" | "serious";
 
 // --- Layout constants ---
 const CENTER = 270;
 const RIGHT = 500;
 
-// --- Lightweight core (default) ---
-function lightweightNodes(): Node[] {
+// --- Lightweight core ---
+function lightweightInfraNodes(): Node[] {
   return [
     {
       id: "core",
@@ -27,14 +24,14 @@ function lightweightNodes(): Node[] {
   ];
 }
 
-function lightweightEdges(): Edge[] {
+function lightweightInfraEdges(): Edge[] {
   return [
     { id: "core-app", source: "core", target: "app", type: "animated" },
   ];
 }
 
 // --- Serious / dedicated core ---
-function seriousNodes(): Node[] {
+function seriousInfraNodes(): Node[] {
   return [
     {
       id: "core",
@@ -83,7 +80,7 @@ function seriousNodes(): Node[] {
   ];
 }
 
-function seriousEdges(): Edge[] {
+function seriousInfraEdges(): Edge[] {
   return [
     { id: "core-l7", source: "core", target: "l7", type: "animated" },
     { id: "core-stats", source: "core", target: "stats", type: "animated" },
@@ -92,108 +89,115 @@ function seriousEdges(): Edge[] {
   ];
 }
 
-// --- Shared application services ---
-const APP_Y_LIGHT = 160;
-const APP_Y_SERIOUS = 210;
-const appY = CORE_MODE === "serious" ? APP_Y_SERIOUS : APP_Y_LIGHT;
-const managedY = appY + 130;
-const storageY = managedY + 110;
+// --- Build nodes/edges for a given mode ---
+export function buildNodes(mode: CoreMode): Node[] {
+  const appY = mode === "serious" ? 210 : 160;
+  const managedY = appY + 130;
+  const storageY = managedY + 110;
 
-const appServiceNodes: Node[] = [
-  {
-    id: "app",
-    type: "service",
-    position: { x: CENTER, y: appY },
-    data: {
-      label: "Frontend + API",
-      sublabel: "Bun + Hono + React",
-      hostname: "app",
-      port: "3000",
-      icon: "globe",
-      category: "runtime",
-    } satisfies ServiceNodeData,
-  },
-  {
-    id: "nats",
-    type: "service",
-    position: { x: RIGHT, y: appY },
-    data: {
-      label: "NATS",
-      sublabel: "Message Broker",
-      hostname: "queue",
-      port: "4222",
-      icon: "zap",
-      category: "messaging",
-    } satisfies ServiceNodeData,
-  },
-  {
-    id: "db",
-    type: "service",
-    position: { x: 50, y: managedY },
-    data: {
-      label: "PostgreSQL",
-      sublabel: "Database",
-      hostname: "db",
-      port: "5432",
-      icon: "database",
-      category: "data",
-    } satisfies ServiceNodeData,
-  },
-  {
-    id: "valkey",
-    type: "service",
-    position: { x: CENTER, y: managedY },
-    data: {
-      label: "Valkey",
-      sublabel: "Cache",
-      hostname: "redis",
-      port: "6379",
-      icon: "layers",
-      category: "data",
-    } satisfies ServiceNodeData,
-  },
-  {
-    id: "worker",
-    type: "service",
-    position: { x: RIGHT, y: managedY },
-    data: {
-      label: "Worker",
-      sublabel: "Python + Pillow",
-      hostname: "worker",
-      port: "—",
-      icon: "cog",
-      category: "runtime",
-    } satisfies ServiceNodeData,
-  },
-  {
-    id: "storage",
-    type: "service",
-    position: { x: CENTER + 30, y: storageY },
-    data: {
-      label: "Object Storage",
-      sublabel: "S3-compatible",
-      hostname: "storage",
-      port: "443",
-      icon: "hard-drive",
-      category: "data",
-    } satisfies ServiceNodeData,
-  },
-];
+  const infraNodes = mode === "serious" ? seriousInfraNodes() : lightweightInfraNodes();
 
-const appServiceEdges: Edge[] = [
-  { id: "app-nats", source: "app", target: "nats", type: "animated" },
-  { id: "app-db", source: "app", target: "db", type: "animated" },
-  { id: "app-valkey", source: "app", target: "valkey", type: "animated" },
-  { id: "app-storage", source: "app", target: "storage", type: "animated" },
-  { id: "nats-worker", source: "nats", target: "worker", type: "animated" },
-  { id: "worker-db", source: "worker", target: "db", type: "animated" },
-  { id: "worker-valkey", source: "worker", target: "valkey", type: "animated" },
-  { id: "worker-storage", source: "worker", target: "storage", type: "animated" },
-];
+  const appServiceNodes: Node[] = [
+    {
+      id: "app",
+      type: "service",
+      position: { x: CENTER, y: appY },
+      data: {
+        label: "Frontend + API",
+        sublabel: "Bun + Hono + React",
+        hostname: "app",
+        port: "3000",
+        icon: "globe",
+        category: "runtime",
+      } satisfies ServiceNodeData,
+    },
+    {
+      id: "nats",
+      type: "service",
+      position: { x: RIGHT, y: appY },
+      data: {
+        label: "NATS",
+        sublabel: "Message Broker",
+        hostname: "queue",
+        port: "4222",
+        icon: "zap",
+        category: "messaging",
+      } satisfies ServiceNodeData,
+    },
+    {
+      id: "db",
+      type: "service",
+      position: { x: 50, y: managedY },
+      data: {
+        label: "PostgreSQL",
+        sublabel: "Database",
+        hostname: "db",
+        port: "5432",
+        icon: "database",
+        category: "data",
+      } satisfies ServiceNodeData,
+    },
+    {
+      id: "valkey",
+      type: "service",
+      position: { x: CENTER, y: managedY },
+      data: {
+        label: "Valkey",
+        sublabel: "Cache",
+        hostname: "redis",
+        port: "6379",
+        icon: "layers",
+        category: "data",
+      } satisfies ServiceNodeData,
+    },
+    {
+      id: "worker",
+      type: "service",
+      position: { x: RIGHT, y: managedY },
+      data: {
+        label: "Worker",
+        sublabel: "Python + Pillow",
+        hostname: "worker",
+        port: "—",
+        icon: "cog",
+        category: "runtime",
+      } satisfies ServiceNodeData,
+    },
+    {
+      id: "storage",
+      type: "service",
+      position: { x: CENTER + 30, y: storageY },
+      data: {
+        label: "Object Storage",
+        sublabel: "S3-compatible",
+        hostname: "storage",
+        port: "443",
+        icon: "hard-drive",
+        category: "data",
+      } satisfies ServiceNodeData,
+    },
+  ];
 
-// --- Compose based on mode ---
-const infraNodes = CORE_MODE === "serious" ? seriousNodes() : lightweightNodes();
-const infraEdges = CORE_MODE === "serious" ? seriousEdges() : lightweightEdges();
+  return [...infraNodes, ...appServiceNodes];
+}
 
-export const serviceNodes: Node[] = [...infraNodes, ...appServiceNodes];
-export const serviceEdges: Edge[] = [...infraEdges, ...appServiceEdges];
+export function buildEdges(mode: CoreMode): Edge[] {
+  const infraEdges = mode === "serious" ? seriousInfraEdges() : lightweightInfraEdges();
+
+  const appServiceEdges: Edge[] = [
+    { id: "app-nats", source: "app", target: "nats", type: "animated" },
+    { id: "app-db", source: "app", target: "db", type: "animated" },
+    { id: "app-valkey", source: "app", target: "valkey", type: "animated" },
+    { id: "app-storage", source: "app", target: "storage", type: "animated" },
+    { id: "nats-worker", source: "nats", target: "worker", type: "animated" },
+    { id: "worker-db", source: "worker", target: "db", type: "animated" },
+    { id: "worker-valkey", source: "worker", target: "valkey", type: "animated" },
+    { id: "worker-storage", source: "worker", target: "storage", type: "animated" },
+  ];
+
+  return [...infraEdges, ...appServiceEdges];
+}
+
+// Default exports for backward compat
+export const serviceNodes = buildNodes("lightweight");
+export const serviceEdges = buildEdges("lightweight");

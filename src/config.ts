@@ -34,4 +34,6 @@ export const config = {
   },
 
   demoBurstMax: parseInt(process.env.DEMO_BURST_MAX || "20"),
+
+  coreMode: (process.env.CORE_MODE || "lightweight") as "lightweight" | "serious",
 } as const;

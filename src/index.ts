@@ -54,6 +54,11 @@ app.get("/api/health", async (c) => {
   return c.json({ status: allOk ? "ok" : "degraded", services: checks });
 });
 
+// Frontend config (runtime values)
+app.get("/api/config", (c) => {
+  return c.json({ coreMode: config.coreMode });
+});
+
 // Static file serving for frontend — works both in source mode and bundled mode
 const bundledDistDir = join(process.cwd(), "frontend/dist");
 const sourceDistDir = join(import.meta.dir, "../frontend/dist");

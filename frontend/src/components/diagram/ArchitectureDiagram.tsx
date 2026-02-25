@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   ReactFlow,
   Background,
@@ -9,10 +10,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { serviceNodes, serviceEdges } from "./nodes";
+import { buildNodes, buildEdges } from "./nodes";
 import { ServiceNode } from "./ServiceNode";
 import { InfraNode } from "./InfraNode";
 import { AnimatedEdge } from "./AnimatedEdge";
+import { usePipelineStore } from "../../store/pipeline";
 
 const nodeTypes: NodeTypes = {
   service: ServiceNode,
@@ -24,8 +26,13 @@ const edgeTypes: EdgeTypes = {
 };
 
 export function ArchitectureDiagram() {
-  const [nodes] = useNodesState(serviceNodes);
-  const [edges] = useEdgesState(serviceEdges);
+  const coreMode = usePipelineStore((s) => s.coreMode);
+
+  const initialNodes = useMemo(() => buildNodes(coreMode), [coreMode]);
+  const initialEdges = useMemo(() => buildEdges(coreMode), [coreMode]);
+
+  const [nodes] = useNodesState(initialNodes);
+  const [edges] = useEdgesState(initialEdges);
 
   return (
     <div className="w-full h-full rounded-xl border border-zinc-200 bg-zinc-50/50 overflow-hidden">
@@ -38,6 +45,7 @@ export function ArchitectureDiagram() {
       </div>
 
       <ReactFlow
+        key={coreMode}
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}

@@ -6,6 +6,7 @@ export function useWebSocket() {
   const handleWSMessage = usePipelineStore((s) => s.handleWSMessage);
   const setConnected = usePipelineStore((s) => s.setConnected);
   const loadEvents = usePipelineStore((s) => s.loadEvents);
+  const loadConfig = usePipelineStore((s) => s.loadConfig);
 
   useEffect(() => {
     let reconnectTimer: ReturnType<typeof setTimeout>;
@@ -21,6 +22,7 @@ export function useWebSocket() {
       ws.onopen = () => {
         console.log("[ws] Connected");
         setConnected(true);
+        loadConfig();
         loadEvents();
       };
 
@@ -61,5 +63,5 @@ export function useWebSocket() {
       clearInterval(pingInterval);
       wsRef.current?.close();
     };
-  }, [handleWSMessage, setConnected, loadEvents]);
+  }, [handleWSMessage, setConnected, loadEvents, loadConfig]);
 }

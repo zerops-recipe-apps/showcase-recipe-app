@@ -42,6 +42,9 @@ export interface Stats {
 }
 
 interface PipelineStore {
+  coreMode: "lightweight" | "serious";
+  loadConfig: () => Promise<void>;
+
   connected: boolean;
   setConnected: (v: boolean) => void;
 
@@ -68,6 +71,17 @@ interface PipelineStore {
 const ACTIVATION_DURATION_MS = 2000;
 
 export const usePipelineStore = create<PipelineStore>((set, get) => ({
+  coreMode: "lightweight",
+  loadConfig: async () => {
+    try {
+      const res = await fetch("/api/config");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.coreMode) set({ coreMode: data.coreMode });
+      }
+    } catch {}
+  },
+
   connected: false,
   setConnected: (v) => set({ connected: v }),
 
