@@ -148,7 +148,7 @@ export function buildNodes(mode: CoreMode): Node[] {
         label: "Object Storage",
         sublabel: "S3-compatible",
         hostname: "storage",
-        port: "443",
+        port: "—",
         icon: "hard-drive",
         category: "data",
       } satisfies ServiceNodeData,

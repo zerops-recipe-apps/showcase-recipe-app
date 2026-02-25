@@ -36,10 +36,10 @@ export function Layout() {
 
       <main className="max-w-7xl mx-auto px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 h-[520px]">
+          <div className="lg:col-span-3 h-[650px]">
             <ArchitectureDiagram />
           </div>
-          <div className="lg:col-span-2 h-[520px]">
+          <div className="lg:col-span-2 h-[650px]">
             <EventLog />
           </div>
         </div>
