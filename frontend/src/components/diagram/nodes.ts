@@ -36,43 +36,22 @@ function seriousInfraNodes(): Node[] {
     {
       id: "core",
       type: "infra",
-      position: { x: CENTER - 40, y: 10 },
+      position: { x: CENTER - 60, y: 10 },
       data: {
         label: "Project Core",
-        sublabel: "L3 balancer + firewall",
+        sublabel: "Dedicated infrastructure service",
         icon: "shield",
         variant: "core",
-      },
-    },
-    {
-      id: "stats",
-      type: "infra",
-      position: { x: RIGHT, y: 10 },
-      data: {
-        label: "Stats",
-        sublabel: "Metrics",
-        icon: "activity",
-        variant: "infra",
-      },
-    },
-    {
-      id: "logger",
-      type: "infra",
-      position: { x: RIGHT + 130, y: 10 },
-      data: {
-        label: "Logger",
-        sublabel: "Logs",
-        icon: "file-text",
-        variant: "infra",
+        processes: ["L3 ctrl", "firewall", "stats", "logger"],
       },
     },
     {
       id: "l7",
       type: "infra",
-      position: { x: CENTER, y: 90 },
+      position: { x: CENTER, y: 100 },
       data: {
         label: "L7 HTTP Balancer",
-        sublabel: "Routing & TLS",
+        sublabel: "Dedicated routing service",
         icon: "network",
         variant: "balancer",
       },
@@ -83,8 +62,6 @@ function seriousInfraNodes(): Node[] {
 function seriousInfraEdges(): Edge[] {
   return [
     { id: "core-l7", source: "core", target: "l7", type: "animated" },
-    { id: "core-stats", source: "core", target: "stats", type: "animated" },
-    { id: "core-logger", source: "core", target: "logger", type: "animated" },
     { id: "l7-app", source: "l7", target: "app", type: "animated" },
   ];
 }

@@ -1,14 +1,13 @@
 import { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import {
-  Shield, Activity, FileText, Network,
+  Shield, Network, Server,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
   shield: Shield,
-  activity: Activity,
-  "file-text": FileText,
   network: Network,
+  server: Server,
 };
 
 const variantStyles: Record<string, { bg: string; border: string; text: string }> = {
@@ -22,24 +21,21 @@ const variantStyles: Record<string, { bg: string; border: string; text: string }
     border: "border-slate-200",
     text: "text-slate-600",
   },
-  infra: {
-    bg: "bg-zinc-50",
-    border: "border-zinc-200",
-    text: "text-zinc-500",
-  },
 };
 
 interface InfraNodeData {
   label: string;
   sublabel: string;
   icon: string;
-  variant: "core" | "balancer" | "infra";
+  variant: "core" | "balancer";
+  /** Internal containers/processes within this service */
+  processes?: string[];
 }
 
 function InfraNodeComponent({ data }: NodeProps) {
   const d = data as unknown as InfraNodeData;
   const Icon = iconMap[d.icon] || Shield;
-  const style = variantStyles[d.variant] || variantStyles.infra;
+  const style = variantStyles[d.variant] || variantStyles.core;
 
   return (
     <>
@@ -50,9 +46,10 @@ function InfraNodeComponent({ data }: NodeProps) {
 
       <div
         className={[
-          "rounded-lg border px-3 py-2 min-w-[120px] select-none",
+          "rounded-lg border px-3 py-2 select-none",
           style.bg,
           style.border,
+          d.processes ? "min-w-[220px]" : "min-w-[120px]",
         ].join(" ")}
       >
         <div className="flex items-center gap-2">
@@ -66,6 +63,19 @@ function InfraNodeComponent({ data }: NodeProps) {
             </div>
           </div>
         </div>
+
+        {d.processes && d.processes.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {d.processes.map((p) => (
+              <span
+                key={p}
+                className="text-[9px] bg-white/60 border border-teal-100 text-teal-500 px-1.5 py-0.5 rounded font-mono"
+              >
+                {p}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
