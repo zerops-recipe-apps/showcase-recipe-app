@@ -3,11 +3,11 @@ import type { ServiceNodeData } from "./types";
 
 type CoreMode = "lightweight" | "serious";
 
-// --- Layout constants ---
-const LEFT = 30;
-const CENTER_LEFT = 200;
-const CENTER_RIGHT = 380;
-const RIGHT = 550;
+// --- Layout constants (fitView auto-scales to container) ---
+const LEFT = 0;
+const CENTER_LEFT = 230;
+const CENTER_RIGHT = 460;
+const RIGHT = 690;
 
 // --- Lightweight core ---
 function lightweightInfraNodes(): Node[] {
@@ -76,6 +76,7 @@ export function buildNodes(mode: CoreMode): Node[] {
   const infraNodes = mode === "serious" ? seriousInfraNodes() : lightweightInfraNodes();
 
   const appServiceNodes: Node[] = [
+    // --- Runtime row ---
     {
       id: "app",
       type: "service",
@@ -90,18 +91,19 @@ export function buildNodes(mode: CoreMode): Node[] {
       } satisfies ServiceNodeData,
     },
     {
-      id: "nats",
+      id: "worker",
       type: "service",
       position: { x: CENTER_RIGHT, y: appY },
       data: {
-        label: "NATS",
-        sublabel: "Message Broker",
-        hostname: "queue",
-        port: "4222",
-        icon: "zap",
-        category: "messaging",
+        label: "Worker",
+        sublabel: "Python + Pillow",
+        hostname: "worker",
+        port: "—",
+        icon: "cog",
+        category: "runtime",
       } satisfies ServiceNodeData,
     },
+    // --- Data / managed row ---
     {
       id: "db",
       type: "service",
@@ -129,16 +131,16 @@ export function buildNodes(mode: CoreMode): Node[] {
       } satisfies ServiceNodeData,
     },
     {
-      id: "worker",
+      id: "nats",
       type: "service",
       position: { x: CENTER_RIGHT, y: dataY },
       data: {
-        label: "Worker",
-        sublabel: "Python + Pillow",
-        hostname: "worker",
-        port: "—",
-        icon: "cog",
-        category: "runtime",
+        label: "NATS",
+        sublabel: "Message Broker",
+        hostname: "queue",
+        port: "4222",
+        icon: "zap",
+        category: "messaging",
       } satisfies ServiceNodeData,
     },
     {
@@ -163,11 +165,13 @@ export function buildEdges(mode: CoreMode): Edge[] {
   const infraEdges = mode === "serious" ? seriousInfraEdges() : lightweightInfraEdges();
 
   const appServiceEdges: Edge[] = [
-    { id: "app-nats", source: "app", target: "nats", type: "animated" },
+    // App connections
     { id: "app-db", source: "app", target: "db", type: "animated" },
     { id: "app-valkey", source: "app", target: "valkey", type: "animated" },
+    { id: "app-nats", source: "app", target: "nats", type: "animated" },
     { id: "app-storage", source: "app", target: "storage", type: "animated" },
-    { id: "nats-worker", source: "nats", target: "worker", type: "animated" },
+    // Worker connections
+    { id: "worker-nats", source: "worker", target: "nats", type: "animated" },
     { id: "worker-db", source: "worker", target: "db", type: "animated" },
     { id: "worker-valkey", source: "worker", target: "valkey", type: "animated" },
     { id: "worker-storage", source: "worker", target: "storage", type: "animated" },
