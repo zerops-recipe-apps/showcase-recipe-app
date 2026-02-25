@@ -18,23 +18,28 @@ The main application configuration file you place at the root of your repository
 
 ```yaml
 zerops:
-  # Production setup — build React frontend + bundle Bun backend into optimized artifacts.
-  # Bun's bundler inlines all dependencies, so no node_modules needed at runtime.
+  # Production setup — build React frontend + bundle
+  # Bun backend into optimized artifacts.
+  # Bun's bundler inlines all deps, no node_modules
+  # needed at runtime.
   - setup: prod
     build:
       base: bun@1.2
 
-      # BUN_INSTALL redirects Bun's global package cache into the project tree so
-      # Zerops can cache it between builds (default ~/.bun is outside build container scope).
+      # BUN_INSTALL redirects Bun's global package cache
+      # into the project tree so Zerops can cache it
+      # between builds (~/.bun is outside build scope).
       envVariables:
         BUN_INSTALL: ./.bun
 
       buildCommands:
-        # --frozen-lockfile validates bun.lock for reproducible production builds
+        # --frozen-lockfile validates bun.lock for
+        # reproducible production builds
         - bun install --frozen-lockfile
         # Build React frontend (Vite + Tailwind) — output lands in frontend/dist
         - cd frontend && bun install --frozen-lockfile && bun run build && cd ..
-        # Bundle backend — Bun inlines all deps (hono, postgres, ioredis, nats, aws-sdk)
+        # Bundle backend — Bun inlines all deps
+        # (hono, postgres, ioredis, nats, aws-sdk)
         - bun build src/index.ts --outfile dist/index.js --target bun
 
       deployFiles:
@@ -48,8 +53,9 @@ zerops:
         - frontend/node_modules
         - .bun/install/cache  # Must match BUN_INSTALL path above
 
-    # Readiness check: verifies the container is healthy before the project balancer
-    # routes traffic. /api/health validates PostgreSQL, Valkey, NATS, and S3 connectivity.
+    # Readiness check: verifies the container is
+    # healthy before the balancer routes traffic.
+    # /api/health checks PG, Valkey, NATS, and S3.
     deploy:
       readinessCheck:
         httpGet:
@@ -65,7 +71,7 @@ zerops:
 
       envVariables:
         NODE_ENV: production
-        # Database — references auto-generated variables from the 'db' service hostname
+        # Database — auto-generated from 'db' service
         DB_HOST: ${db_hostname}
         DB_PORT: ${db_port}
         DB_USER: ${db_user}
@@ -79,7 +85,7 @@ zerops:
         NATS_PORT: ${queue_port}
         NATS_USER: ${queue_user}
         NATS_PASS: ${queue_password}
-        # S3-compatible object storage — referenced by 'storage' service hostname
+        # S3-compatible object storage
         S3_ENDPOINT: ${storage_apiUrl}
         S3_ACCESS_KEY: ${storage_accessKeyId}
         S3_SECRET_KEY: ${storage_secretAccessKey}
@@ -88,7 +94,8 @@ zerops:
       start: bun run dist/index.js
 
   # Development setup — deploy full source for live editing via SSH.
-  # The developer SSHs in after deploy and starts the dev server with hot reload.
+  # Developer SSHs in after deploy and starts
+  # the dev server with hot reload.
   - setup: dev
     build:
       base: bun@1.2
@@ -97,7 +104,8 @@ zerops:
         BUN_INSTALL: ./.bun
 
       buildCommands:
-        # bun install (not --frozen-lockfile) — lockfile may not exist in fresh forks
+        # No --frozen-lockfile — lockfile may not
+        # exist in fresh forks
         - bun install
         - cd frontend && bun install && cd ..
 
