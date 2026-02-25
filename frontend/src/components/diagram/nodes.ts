@@ -15,7 +15,7 @@ function lightweightInfraNodes(): Node[] {
     {
       id: "core",
       type: "infra",
-      position: { x: CENTER_LEFT, y: 30 },
+      position: { x: CENTER_LEFT, y: 0 },
       data: {
         label: "Zerops Core",
         sublabel: "L3 + L7 balancer, firewall, stats, logger",
@@ -38,7 +38,7 @@ function seriousInfraNodes(): Node[] {
     {
       id: "core",
       type: "infra",
-      position: { x: CENTER_LEFT - 10, y: 10 },
+      position: { x: CENTER_LEFT + 5, y: 0 },
       data: {
         label: "Project Core",
         sublabel: "Dedicated infrastructure service",
@@ -50,7 +50,7 @@ function seriousInfraNodes(): Node[] {
     {
       id: "l7",
       type: "infra",
-      position: { x: CENTER_LEFT, y: 100 },
+      position: { x: CENTER_LEFT + 30, y: 150 },
       data: {
         label: "L7 HTTP Balancer",
         sublabel: "Dedicated routing service",
@@ -70,8 +70,8 @@ function seriousInfraEdges(): Edge[] {
 
 // --- Build nodes/edges for a given mode ---
 export function buildNodes(mode: CoreMode): Node[] {
-  const appY = mode === "serious" ? 210 : 160;
-  const dataY = appY + 130;
+  const appY = mode === "serious" ? 320 : 220;
+  const dataY = appY + 180;
 
   const infraNodes = mode === "serious" ? seriousInfraNodes() : lightweightInfraNodes();
 
