@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   ReactFlow,
   Background,
   BackgroundVariant,
   type NodeTypes,
   type EdgeTypes,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -29,6 +30,15 @@ export function ArchitectureDiagram() {
   const nodes = useMemo(() => buildNodes(coreMode), [coreMode]);
   const edges = useMemo(() => buildEdges(coreMode), [coreMode]);
 
+  // fitView centers content vertically; shift viewport up so graph sits near the top
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    instance.fitView({ padding: 0.05 });
+    requestAnimationFrame(() => {
+      const vp = instance.getViewport();
+      instance.setViewport({ ...vp, y: vp.y + 50 });
+    });
+  }, []);
+
   return (
     <div className="w-full h-full rounded-xl border border-zinc-200 bg-zinc-50/50 overflow-hidden">
       <div className="px-4 py-2 border-b border-zinc-200 bg-white flex items-center justify-between">
@@ -45,8 +55,7 @@ export function ArchitectureDiagram() {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.05 }}
+        onInit={onInit}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
