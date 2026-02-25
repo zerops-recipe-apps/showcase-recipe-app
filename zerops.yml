@@ -1,20 +1,25 @@
 zerops:
-  # Production setup — build frontend + bundle backend
+  # Production setup — build React frontend + bundle Bun backend into optimized artifacts.
+  # Bun's bundler inlines all dependencies, so no node_modules needed at runtime.
   - setup: prod
     build:
       base: bun@1.2
 
+      # BUN_INSTALL redirects Bun's global package cache into the project tree so
+      # Zerops can cache it between builds (default ~/.bun is outside build container scope).
       envVariables:
         BUN_INSTALL: ./.bun
 
       buildCommands:
+        # --frozen-lockfile validates bun.lock for reproducible production builds
         - bun install --frozen-lockfile
-        # Build frontend
+        # Build React frontend (Vite + Tailwind) — output lands in frontend/dist
         - cd frontend && bun install --frozen-lockfile && bun run build && cd ..
-        # Bundle backend (includes all deps)
+        # Bundle backend — Bun inlines all deps (hono, postgres, ioredis, nats, aws-sdk)
         - bun build src/index.ts --outfile dist/index.js --target bun
 
       deployFiles:
+        # Bundled backend + compiled frontend + DB schema for init
         - ./dist
         - ./frontend/dist
         - ./src/db/schema.sql
@@ -22,8 +27,10 @@ zerops:
       cache:
         - node_modules
         - frontend/node_modules
-        - .bun/install/cache
+        - .bun/install/cache  # Must match BUN_INSTALL path above
 
+    # Readiness check: verifies the container is healthy before the project balancer
+    # routes traffic. /api/health validates PostgreSQL, Valkey, NATS, and S3 connectivity.
     deploy:
       readinessCheck:
         httpGet:
@@ -39,17 +46,21 @@ zerops:
 
       envVariables:
         NODE_ENV: production
+        # Database — references auto-generated variables from the 'db' service hostname
         DB_HOST: ${db_hostname}
         DB_PORT: ${db_port}
         DB_USER: ${db_user}
         DB_PASS: ${db_password}
         DB_NAME: ${db_dbName}
+        # Valkey cache — referenced by 'redis' service hostname
         REDIS_HOST: ${redis_hostname}
         REDIS_PORT: ${redis_port}
+        # NATS message queue — referenced by 'queue' service hostname
         NATS_HOST: ${queue_hostname}
         NATS_PORT: ${queue_port}
         NATS_USER: ${queue_user}
         NATS_PASS: ${queue_password}
+        # S3-compatible object storage — referenced by 'storage' service hostname
         S3_ENDPOINT: ${storage_apiUrl}
         S3_ACCESS_KEY: ${storage_accessKeyId}
         S3_SECRET_KEY: ${storage_secretAccessKey}
@@ -57,7 +68,8 @@ zerops:
 
       start: bun run dist/index.js
 
-  # Development setup — deploy full source for live editing via SSH
+  # Development setup — deploy full source for live editing via SSH.
+  # The developer SSHs in after deploy and starts the dev server with hot reload.
   - setup: dev
     build:
       base: bun@1.2
@@ -66,10 +78,12 @@ zerops:
         BUN_INSTALL: ./.bun
 
       buildCommands:
+        # bun install (not --frozen-lockfile) — lockfile may not exist in fresh forks
         - bun install
         - cd frontend && bun install && cd ..
 
       deployFiles:
+        # Deploy everything — developer runs TypeScript source directly via SSH
         - ./
 
       cache:

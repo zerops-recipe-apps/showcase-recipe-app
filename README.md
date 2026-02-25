@@ -38,11 +38,10 @@ zerops:
         - bun build src/index.ts --outfile dist/index.js --target bun
 
       deployFiles:
-        # Bundled backend + compiled frontend + DB schema for init + demo seed images
+        # Bundled backend + compiled frontend + DB schema for init
         - ./dist
         - ./frontend/dist
         - ./src/db/schema.sql
-        - ./seed
 
       cache:
         - node_modules
