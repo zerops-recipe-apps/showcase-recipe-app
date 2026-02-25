@@ -46,7 +46,7 @@ export function ArchitectureDiagram() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.05 }}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
@@ -57,7 +57,7 @@ export function ArchitectureDiagram() {
         zoomOnDoubleClick={false}
         preventScrolling={false}
         minZoom={0.8}
-        maxZoom={1.2}
+        maxZoom={1.5}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#e4e4e7" />
       </ReactFlow>

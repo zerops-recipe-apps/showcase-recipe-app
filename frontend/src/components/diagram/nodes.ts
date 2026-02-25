@@ -50,7 +50,7 @@ function seriousInfraNodes(): Node[] {
     {
       id: "l7",
       type: "infra",
-      position: { x: CENTER_LEFT + 30, y: 100 },
+      position: { x: CENTER_LEFT + 30, y: 80 },
       data: {
         label: "L7 HTTP Balancer",
         sublabel: "Dedicated routing service",
@@ -70,7 +70,7 @@ function seriousInfraEdges(): Edge[] {
 
 // --- Build nodes/edges for a given mode ---
 export function buildNodes(mode: CoreMode): Node[] {
-  const appY = mode === "serious" ? 260 : 220;
+  const appY = mode === "serious" ? 230 : 170;
   const dataY = appY + 180;
 
   const infraNodes = mode === "serious" ? seriousInfraNodes() : lightweightInfraNodes();
