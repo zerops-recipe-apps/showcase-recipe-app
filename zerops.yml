@@ -61,6 +61,8 @@ zerops:
         # Valkey cache — referenced by 'redis' service hostname
         REDIS_HOST: ${redis_hostname}
         REDIS_PORT: ${redis_port}
+        # Valkey can be password-protected.
+        REDIS_PASSWORD: ${redis_password}
         # NATS message queue — referenced by 'queue' service hostname
         NATS_HOST: ${queue_hostname}
         NATS_PORT: ${queue_port}

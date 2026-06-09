@@ -12,7 +12,8 @@ export const config = {
   valkey: {
     host: process.env.REDIS_HOST || process.env.redis_hostname || "localhost",
     port: parseInt(process.env.REDIS_PORT || process.env.redis_port || "6379"),
-    password: undefined as string | undefined,
+    // Valkey can be password-protected.
+    password: process.env.REDIS_PASSWORD || undefined,
   },
 
   nats: {

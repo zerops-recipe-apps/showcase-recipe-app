@@ -13,7 +13,10 @@ export interface PipelineEvent {
 export const valkey = new Redis({
   host: config.valkey.host,
   port: config.valkey.port,
-  password: config.valkey.password,
+  // Valkey can be password-protected; authenticate as "default" when set.
+  ...(config.valkey.password
+    ? { username: "default", password: config.valkey.password }
+    : {}),
   maxRetriesPerRequest: 3,
   retryStrategy(times) {
     return Math.min(times * 200, 5000);
