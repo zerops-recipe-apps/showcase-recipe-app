@@ -77,9 +77,11 @@ zerops:
         DB_USER: ${db_user}
         DB_PASS: ${db_password}
         DB_NAME: ${db_dbName}
-        # Valkey cache — referenced by 'redis' service hostname
+        # Valkey cache — referenced by 'redis' service hostname.
+        # Valkey on Zerops requires auth — wire the injected password.
         REDIS_HOST: ${redis_hostname}
         REDIS_PORT: ${redis_port}
+        REDIS_PASSWORD: ${redis_password}
         # NATS message queue — referenced by 'queue' service hostname
         NATS_HOST: ${queue_hostname}
         NATS_PORT: ${queue_port}
@@ -131,5 +133,4 @@ zerops:
       # Container stays idle — developer starts server manually via SSH
       start: zsc noop --silent
 ```
-
 <!-- #ZEROPS_EXTRACT_END:integration-guide# -->
