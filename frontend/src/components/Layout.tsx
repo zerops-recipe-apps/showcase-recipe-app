@@ -4,9 +4,10 @@ import { UploadZone } from "./UploadZone";
 import { Gallery } from "./Gallery";
 import { StatsBar } from "./StatsBar";
 import { DemoBurst } from "./DemoBurst";
+import { GraduationCap } from "lucide-react";
 import { usePipelineStore } from "../store/pipeline";
 
-export function Layout() {
+export function Layout({ onOpenGuide }: { onOpenGuide?: () => void }) {
   const connected = usePipelineStore((s) => s.connected);
 
   return (
@@ -20,6 +21,15 @@ export function Layout() {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            {onOpenGuide && (
+              <button
+                onClick={onOpenGuide}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
+              >
+                <GraduationCap size={16} />
+                How it works
+              </button>
+            )}
             <DemoBurst />
             <UploadZone />
             <div className="flex items-center gap-1.5">
