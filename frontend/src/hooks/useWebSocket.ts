@@ -61,7 +61,23 @@ export function useWebSocket() {
       intentionalClose = true;
       clearTimeout(reconnectTimer);
       clearInterval(pingInterval);
-      wsRef.current?.close();
+
+      const ws = wsRef.current;
+      if (!ws) return;
+
+      // Detach our handlers so the teardown close() doesn't log an error or
+      // trigger a reconnect (e.g. React StrictMode's dev double-mount).
+      ws.onclose = null;
+      ws.onerror = null;
+
+      if (ws.readyState === WebSocket.CONNECTING) {
+        // Closing a still-CONNECTING socket makes the browser warn
+        // "closed before the connection is established" — wait until it
+        // opens, then close cleanly.
+        ws.onopen = () => ws.close();
+      } else {
+        ws.close();
+      }
     };
   }, [handleWSMessage, setConnected, loadEvents, loadConfig]);
 }
