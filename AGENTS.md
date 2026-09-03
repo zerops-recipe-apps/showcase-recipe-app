@@ -10,7 +10,7 @@ Full-stack image-processing pipeline: Bun/Hono backend + React/Vite frontend, wi
   - `redis` (Valkey) — env: `REDIS_HOST`, `REDIS_PORT`
   - `queue` (NATS) — env: `NATS_HOST`, `NATS_PORT`, `NATS_USER`, `NATS_PASS`
   - `storage` (S3-compatible) — env: `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_BUCKET`
-- Runtime base: `bun@1.2`
+- Runtime base: `bun@1.3`
 
 ## Zerops dev
 

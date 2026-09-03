@@ -24,7 +24,7 @@ zerops:
   # needed at runtime.
   - setup: prod
     build:
-      base: bun@1.2
+      base: bun@1.3
 
       # BUN_INSTALL redirects Bun's global package cache
       # into the project tree so Zerops can cache it
@@ -63,7 +63,7 @@ zerops:
           path: /api/health
 
     run:
-      base: bun@1.2
+      base: bun@1.3
 
       ports:
         - port: 3000
@@ -100,7 +100,7 @@ zerops:
   # the dev server with hot reload.
   - setup: dev
     build:
-      base: bun@1.2
+      base: bun@1.3
 
       envVariables:
         BUN_INSTALL: ./.bun
@@ -121,7 +121,7 @@ zerops:
         - .bun/install/cache
 
     run:
-      base: bun@1.2
+      base: bun@1.3
 
       ports:
         - port: 3000
