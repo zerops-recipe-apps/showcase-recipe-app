@@ -52,6 +52,8 @@ zerops:
 
       envVariables:
         NODE_ENV: production
+        # Service vault `CORE_MODE` → RUNTIME_CORE_MODE at deploy.
+        CORE_MODE: ${RUNTIME_CORE_MODE:-serious}
         # Database — auto-generated from 'db' service
         DB_HOST: ${db_hostname}
         DB_PORT: ${db_port}
@@ -110,6 +112,7 @@ zerops:
 
       envVariables:
         NODE_ENV: development
+        CORE_MODE: ${RUNTIME_CORE_MODE:-serious}
 
       # Container stays idle — developer starts server manually via SSH
       start: zsc noop --silent
